@@ -20,7 +20,7 @@ public class NormalizerTest {
     @BeforeEach
     public void beforeEach() {
         // TODO override it here
-        normalizer = null;
+        normalizer = new NormalizerImpl();
     }
 
     public Normalizer normalizer() {
@@ -92,7 +92,7 @@ public class NormalizerTest {
         ScoringSummary summary = normalizer.zscore(csvPath, destPath, columnName);
         Assertions.assertNotNull(summary, "the returned summary is null");
 
-        Assertions.assertEquals(new BigDecimal("1702.00"), summary.mean(), "invalid mean");
+        Assertions.assertEquals(new BigDecimal("1701.00"), summary.mean(), "invalid mean");
         Assertions.assertEquals(new BigDecimal("785.19"), summary.standardDeviation(), "invalid standard deviation");
         Assertions.assertEquals(new BigDecimal("616523.00"), summary.variance(), "invalid variance");
         Assertions.assertEquals(new BigDecimal("1758.00"), summary.median(), "invalid median");
@@ -172,7 +172,7 @@ public class NormalizerTest {
         ScoringSummary summary = normalizer.minMaxScaling(csvPath, destPath, columnName);
         Assertions.assertNotNull(summary, "the returned summary is null");
 
-        Assertions.assertEquals(new BigDecimal("1702.00"), summary.mean(), "invalid mean");
+        Assertions.assertEquals(new BigDecimal("1701.00"), summary.mean(), "invalid mean");
         Assertions.assertEquals(new BigDecimal("785.19"), summary.standardDeviation(), "invalid standard deviation");
         Assertions.assertEquals(new BigDecimal("616523.00"), summary.variance(), "invalid variance");
         Assertions.assertEquals(new BigDecimal("1758.00"), summary.median(), "invalid median");
