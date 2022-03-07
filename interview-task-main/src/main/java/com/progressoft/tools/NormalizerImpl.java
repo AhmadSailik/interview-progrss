@@ -28,11 +28,18 @@ public class NormalizerImpl implements Normalizer {
         summary = generateScoringSummary(csvPath,destPath, colToNormalize,type);
         return summary;
     }
+//    public BigDecimal[] converToBigarr(String[] arr){
+//        BigDecimal[] bigDecimals=new BigDecimal[arr.length];
+//        for (int i = 0; i < arr.length; i++) {
+//           bigDecimals[i]=new BigDecimal(arr[i]);
+//        }
+//        return bigDecimals;
+//    }
     public ScoringSummary generateScoringSummary(Path csvPath,Path destPath, String colToStandardize,String type){
         ScoringSummary summary=null;
         String[] nextRecord;
-        ArrayList<Integer>dataOfCol=new ArrayList<>();
-        ArrayList<String[]>arrayListAll=new ArrayList<>();
+        ArrayList<BigDecimal>dataOfCol=new ArrayList<>();
+        ArrayList<String[]> arrayListAll=new ArrayList<>();
         Integer idx=null;
         try {
             List<String>   csvReaders = Files.readAllLines(csvPath);
@@ -49,7 +56,7 @@ public class NormalizerImpl implements Normalizer {
                         throw new IllegalArgumentException("column "+colToStandardize+" not found");
                     }
                 }else {
-                    dataOfCol.add(Integer.parseInt(nextRecord[idx]));
+                    dataOfCol.add(new BigDecimal(nextRecord[idx]));
                 }
             }
         } catch (IOException ex) {
@@ -61,14 +68,13 @@ public class NormalizerImpl implements Normalizer {
             summary=new ScoringSummaryImp(dataOfCol);
         }
         generateFile(destPath,arrayListAll,summary,colToStandardize,type);
+//        checkExist(destPath,arrayListAll,summary,colToStandardize,type);
 
 
         return summary;
 
     }
-    public  void generateFile(Path destPath,ArrayList<String[]> arrayListAll,ScoringSummary summary,String colToStandardize,String type){
-        int idxOfCol = 0;
-        boolean addCol=false;
+    public File checkExist(Path destPath){
         File file=new File(String.valueOf(destPath));
         if (!file.exists()){
             try {
@@ -77,6 +83,13 @@ public class NormalizerImpl implements Normalizer {
                 e.getMessage();
             }
         }
+       return file;
+    }
+
+    public  void generateFile(Path destPath,ArrayList<String[]> arrayListAll,ScoringSummary summary,String colToStandardize,String type){
+        int idxOfCol = 0;
+        boolean addCol=false;
+        File file=checkExist(destPath);
         try {
             FileOutputStream fileOutputStream=new FileOutputStream(file);
             for (int i = 0; i < arrayListAll.size(); i++) {
@@ -88,10 +101,12 @@ public class NormalizerImpl implements Normalizer {
                         fileOutputStream.write((","+colToStandardize+type).getBytes());
                     }
                     if (i>0&&j==idxOfCol&&addCol&&type.equals("_z")){
-                        BigDecimal markz= BigDecimal.valueOf((Double.parseDouble(arrayListAll.get(i)[idxOfCol])-Double.parseDouble(String.valueOf(summary.mean())))/Double.parseDouble(String.valueOf(summary.standardDeviation()))).setScale(2, RoundingMode.HALF_EVEN);
+                        BigDecimal markz= new BigDecimal(String.valueOf(arrayListAll.get(i)[idxOfCol])).subtract(summary.mean()).divide(summary.standardDeviation(),2,RoundingMode.HALF_DOWN).setScale(2);
                         fileOutputStream.write((","+String.valueOf(markz)).getBytes());
                     }else if (i>0&&j==idxOfCol&&addCol&&type.equals("_mm")) {
-                        BigDecimal markmm= BigDecimal.valueOf((Double.parseDouble(arrayListAll.get(i)[idxOfCol])-Double.parseDouble(String.valueOf(summary.min())))/(Double.parseDouble(String.valueOf(summary.max()))-Double.parseDouble(String.valueOf(summary.min())))).setScale(2, RoundingMode.HALF_DOWN);
+//                        BigDecimal markmm=(arrayListAll.get(i)[idxOfCol].subtract(summary.min())).divide((summary.max().subtract(summary.min())),2,RoundingMode.HALF_DOWN).setScale(2);
+//                        BigDecimal markmm=new BigDecimal(arrayListAll.get(i)[idxOfCol]).subtract(summary.min()).divide((summary.max().subtract(summary.min())),2,RoundingMode.HALF_DOWN).setScale(2);
+                        BigDecimal markmm=new BigDecimal(arrayListAll.get(i)[idxOfCol]).subtract(summary.min()).divide((summary.max().subtract(summary.min())),2,RoundingMode.HALF_DOWN).setScale(2);
                         fileOutputStream.write((","+String.valueOf(markmm)).getBytes());
                     }
 
@@ -104,9 +119,11 @@ public class NormalizerImpl implements Normalizer {
             fileOutputStream.close();
         } catch (IOException|NullPointerException e) {
             System.out.println(e.getMessage());
+
         }
 
     }
+
 
 
 

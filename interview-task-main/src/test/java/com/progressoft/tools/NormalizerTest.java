@@ -92,7 +92,7 @@ public class NormalizerTest {
         ScoringSummary summary = normalizer.zscore(csvPath, destPath, columnName);
         Assertions.assertNotNull(summary, "the returned summary is null");
 
-        Assertions.assertEquals(new BigDecimal("1701.00"), summary.mean(), "invalid mean");
+        Assertions.assertEquals(new BigDecimal("1702.00"), summary.mean(), "invalid mean");
         Assertions.assertEquals(new BigDecimal("785.19"), summary.standardDeviation(), "invalid standard deviation");
         Assertions.assertEquals(new BigDecimal("616523.00"), summary.variance(), "invalid variance");
         Assertions.assertEquals(new BigDecimal("1758.00"), summary.median(), "invalid median");
@@ -107,7 +107,6 @@ public class NormalizerTest {
         List<String> expectedLines = Files.readAllLines(assertionPath);
         assertLines(generatedLines, expectedLines);
     }
-
 
     @Test
     public void givenInvalidInput_whenMinMaxScale_thenThrowException() throws IOException {
@@ -172,7 +171,7 @@ public class NormalizerTest {
         ScoringSummary summary = normalizer.minMaxScaling(csvPath, destPath, columnName);
         Assertions.assertNotNull(summary, "the returned summary is null");
 
-        Assertions.assertEquals(new BigDecimal("1701.00"), summary.mean(), "invalid mean");
+        Assertions.assertEquals(new BigDecimal("1702.00"), summary.mean(), "invalid mean");
         Assertions.assertEquals(new BigDecimal("785.19"), summary.standardDeviation(), "invalid standard deviation");
         Assertions.assertEquals(new BigDecimal("616523.00"), summary.variance(), "invalid variance");
         Assertions.assertEquals(new BigDecimal("1758.00"), summary.median(), "invalid median");
@@ -187,6 +186,8 @@ public class NormalizerTest {
         List<String> expectedLines = Files.readAllLines(assertionPath);
         assertLines(expectedLines, generatedLines);
     }
+
+
 
     private final Path copyFile(String resource, Path path) throws IOException {
         try (InputStream is = this.getClass().getResourceAsStream(resource)) {

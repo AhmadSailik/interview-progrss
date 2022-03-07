@@ -14,18 +14,26 @@ public class ScoringSummaryImp implements ScoringSummary{
     private BigDecimal median=null;
     private BigDecimal min=null;
     private BigDecimal max=null;
-    private ArrayList<Integer> arrayList;
+    private ArrayList<BigDecimal> arrayList;
 
     public ScoringSummaryImp() {
     }
 
-    public ScoringSummaryImp(ArrayList<Integer> arrayList) {
+    public ScoringSummaryImp(ArrayList<BigDecimal> arrayList) {
         this.arrayList=arrayList;
     }
-
+    private void claMean(){
+        BigDecimal sum=new BigDecimal(0);
+        for (int i = 0; i < arrayList.size(); i++) {
+            sum=sum.add(arrayList.get(i));
+        }
+        mean= sum.divide(BigDecimal.valueOf(arrayList.size()),0,RoundingMode.HALF_DOWN).setScale(2);
+    }
     @Override
     public BigDecimal mean() {
-        mean= BigDecimal.valueOf(arrayList.stream().collect(Collectors.summingInt(i->i))/arrayList.size()).setScale(2);;
+       if(mean==null){
+           claMean();
+       }
         return mean;
     }
 
@@ -40,14 +48,14 @@ public class ScoringSummaryImp implements ScoringSummary{
 
     @Override
     public BigDecimal variance() {
-        double squareSum=0;
+        BigDecimal sum=new BigDecimal(0);
         if (mean==null){
             mean();
         }
         for (int i = 0; i < arrayList.size(); i++) {
-            squareSum+=Math.pow(arrayList.get(i)-Double.parseDouble(String.valueOf(mean)),2);
+            sum=sum.add((arrayList.get(i).subtract(mean)).pow(2));
         }
-        variance= BigDecimal.valueOf(Math.ceil(squareSum/arrayList.size())).setScale(2);
+        variance= sum.divide(BigDecimal.valueOf(arrayList.size()),0,RoundingMode.HALF_DOWN).setScale(2);
         return variance;
     }
 
@@ -55,22 +63,23 @@ public class ScoringSummaryImp implements ScoringSummary{
     public BigDecimal median() {
         Collections.sort(arrayList);
         if (arrayList.size()%2==0){
-            median= BigDecimal.valueOf((arrayList.get(arrayList.size()/2)+arrayList.get(arrayList.size()/2-1))/2).setScale(2);
+            median= (arrayList.get(arrayList.size()/2).add(arrayList.get(arrayList.size()/2-1))).divide(BigDecimal.valueOf(2),0,RoundingMode.HALF_DOWN).setScale(2);
         }else {
-            median= BigDecimal.valueOf(arrayList.get(arrayList.size()/2)).setScale(2);
+            median=arrayList.get(arrayList.size()/2).setScale(2);
         }
         return median;
     }
 
     @Override
     public BigDecimal min() {
-        min= BigDecimal.valueOf(Collections.min(arrayList)).setScale(2);
+        min= Collections.min(arrayList).setScale(2);
         return min;
     }
 
     @Override
     public BigDecimal max() {
-        max= BigDecimal.valueOf(Collections.max(arrayList)).setScale(2);
+        max= Collections.max(arrayList).setScale(2);
         return max;
     }
 }
+
